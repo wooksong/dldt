@@ -1,0 +1,63 @@
+From 65cf6a4b47ac7ec376e29808e9b48758b84d8e47 Mon Sep 17 00:00:00 2001
+From: Wook Song <wook16.song@samsung.com>
+Date: Wed, 13 Nov 2019 14:57:03 +0900
+Subject: [PATCH 2/3] [CMake] Add a variable to resolve dependency on TBB using
+ system library
+
+In order to resolve the build dependency on TBB using one installed in
+the system, this patch adds a variable to the dependencies.cmake file.
+
+Signed-off-by: Wook Song <wook16.song@samsung.com>
+---
+ inference-engine/cmake/dependencies.cmake | 21 +++++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
+
+diff --git a/inference-engine/cmake/dependencies.cmake b/inference-engine/cmake/dependencies.cmake
+index 89d0c41f..561b057a 100644
+--- a/inference-engine/cmake/dependencies.cmake
++++ b/inference-engine/cmake/dependencies.cmake
+@@ -7,6 +7,9 @@ cmake_policy(SET CMP0054 NEW)
+ #we have number of dependencies stored on ftp
+ include(dependency_solver)
+ 
++include(FindPkgConfig)
++find_package(PkgConfig REQUIRED)
++
+ set_temp_directory(TEMP "${IE_MAIN_SOURCE_DIR}")
+ 
+ include(ExternalProject)
+@@ -79,10 +82,14 @@ if (THREADING STREQUAL "TBB" OR THREADING STREQUAL "TBB_AUTO")
+                 ENVIRONMENT "TBBROOT"
+                 VERSION_REGEX ".*_([a-z]*_([a-z0-9]+\\.)*[0-9]+).*")
+     elseif(LINUX)
+-        RESOLVE_DEPENDENCY(TBB
+-                ARCHIVE_LIN "tbb2019_20181010_lin.tgz"
+-                TARGET_PATH "${TEMP}/tbb"
+-                ENVIRONMENT "TBBROOT")
++        if (USE_TBB_SYSTEM_DEPS)
++            pkg_search_module(TBB REQUIRED libtbb)
++        else(USE_TBB_SYSTEM_DEPS)
++            RESOLVE_DEPENDENCY(TBB
++                    ARCHIVE_LIN "tbb2019_20181010_lin.tgz"
++                    TARGET_PATH "${TEMP}/tbb"
++                    ENVIRONMENT "TBBROOT")
++        endif (USE_TBB_SYSTEM_DEPS)
+     else(APPLE)
+         RESOLVE_DEPENDENCY(TBB
+                 ARCHIVE_MAC "tbb2019_20190414_v1_mac.tgz"
+@@ -90,8 +97,10 @@ if (THREADING STREQUAL "TBB" OR THREADING STREQUAL "TBB_AUTO")
+                 ENVIRONMENT "TBBROOT"
+                 VERSION_REGEX ".*_([a-z]*_([a-z0-9]+\\.)*[0-9]+).*")
+     endif()
+-    log_rpath_from_dir(TBB "${TBB}/lib")
+-    debug_message(STATUS "tbb=" ${TBB})
++    if (NOT USE_TBB_SYSTEM_DEPS)
++        log_rpath_from_dir(TBB "${TBB}/lib")
++        debug_message(STATUS "tbb=" ${TBB})
++    endif (NOT USE_TBB_SYSTEM_DEPS)
+ endif ()
+ 
+ if (ENABLE_OPENCV)
+-- 
+2.17.1
+
