@@ -1,8 +1,12 @@
 %bcond_with tizen
 %if %{with tizen}
+%global debug_package %{nil}
+%global __debug_install_post %{nil}
 
 %if "%{?_lib}" == "lib64"
 %define _cmake_lib_suffix_flag %{?_cmake_lib_suffix64}
+%else
+%define _cmake_lib_suffix_flag %{nil}
 %endif
 
 %ifarch x86_64
@@ -12,6 +16,29 @@
 %endif
 
 %define _extra_cmake_flags %{_cmake_lib_suffix_flag} %{_cmake_sse_support_flag} -DLINUX_OS_NAME="Tizen %{tizen_full_version}"
+
+%ifarch x86_64 i686 armv7l aarch64
+
+%ifarch x86_64
+%define install_arch    intel64
+%endif
+
+%ifarch i686
+%define install_arch    i686
+%endif
+
+%ifarch armv7l
+%define install_arch    armv7l
+%endif
+
+%ifarch aarch64
+%define install_arch    aarch64
+%endif
+
+%else
+%define install_arch    %{_arch}
+%endif
+
 %endif
 
 %define     external_ade_archive        ade-cbe2db61a659c2cc304c3837406f95c39dfa938e
@@ -104,7 +131,7 @@ popd
 %install
 mkdir -p %{buildroot}%{_libdir}
 mkdir -p %{buildroot}%{_libdir}/tbb
-pushd inference-engine/bin/%{_arch}/Release
+pushd inference-engine/bin/%{install_arch}/Release
 install -m 644 lib/*.so %{buildroot}%{_libdir}
 install -m 644 lib/*.xml %{buildroot}%{_libdir}
 install -m 644 lib/*.a %{buildroot}%{_libdir}/tbb
@@ -125,7 +152,7 @@ install -m 644 include/multi-device/*.h* %{buildroot}%{_includedir}/multi-device
 popd
 
 %check
-pushd inference-engine/bin/%{_arch}/Release
+pushd inference-engine/bin/%{install_arch}/Release
 LD_LIBRARY_PATH=./lib ./InferenceEngineUnitTests
 popd
 
