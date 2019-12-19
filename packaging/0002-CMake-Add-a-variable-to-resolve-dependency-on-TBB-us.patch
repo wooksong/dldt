@@ -1,16 +1,18 @@
-From 65cf6a4b47ac7ec376e29808e9b48758b84d8e47 Mon Sep 17 00:00:00 2001
+From cecdd587a8a62d979b8391fba29bae21bf7d2027 Mon Sep 17 00:00:00 2001
 From: Wook Song <wook16.song@samsung.com>
 Date: Wed, 13 Nov 2019 14:57:03 +0900
-Subject: [PATCH 2/3] [CMake] Add a variable to resolve dependency on TBB using
+Subject: [PATCH 2/2] [CMake] Add a variable to resolve dependency on TBB using
  system library
 
 In order to resolve the build dependency on TBB using one installed in
 the system, this patch adds a variable to the dependencies.cmake file.
 
+Change-Id: Ie07a0ce99c7539687b2d2059377da464b9159c8e
 Signed-off-by: Wook Song <wook16.song@samsung.com>
 ---
  inference-engine/cmake/dependencies.cmake | 21 +++++++++++++++------
- 1 file changed, 15 insertions(+), 6 deletions(-)
+ inference-engine/cmake/ie_parallel.cmake  | 10 ++++++++--
+ 2 files changed, 23 insertions(+), 8 deletions(-)
 
 diff --git a/inference-engine/cmake/dependencies.cmake b/inference-engine/cmake/dependencies.cmake
 index 89d0c41f..561b057a 100644
@@ -58,6 +60,27 @@ index 89d0c41f..561b057a 100644
  endif ()
  
  if (ENABLE_OPENCV)
+diff --git a/inference-engine/cmake/ie_parallel.cmake b/inference-engine/cmake/ie_parallel.cmake
+index 97e8c5e9..f8151a87 100644
+--- a/inference-engine/cmake/ie_parallel.cmake
++++ b/inference-engine/cmake/ie_parallel.cmake
+@@ -36,8 +36,14 @@ function(set_ie_threading_interface_for TARGET_NAME)
+             endif ()
+ 
+             if (NOT TBB_INCLUDE_DIRS OR NOT TBB_LIBRARIES_RELEASE)
+-                find_path(TBB_INCLUDE_DIRS tbb/tbb.h ${incl_path} NO_DEFAULT_PATH)
+-                find_library(TBB_LIBRARIES_RELEASE tbb ${lib_rel_path} NO_DEFAULT_PATH)
++                if (USE_TBB_SYSTEM_DEPS)
++                    pkg_search_module(SYSTEM_TBB REQUIRED libtbb)
++                    set(incl_path ${SYSTEM_TBB_INCLUDE_DIRS})
++                    set(TBB_LIBRARIES_RELEASE ${SYSTEM_TBB_LIBRARIES})
++                else ()
++                    find_path(TBB_INCLUDE_DIRS tbb/tbb.h ${incl_path} NO_DEFAULT_PATH)
++                    find_library(TBB_LIBRARIES_RELEASE tbb ${lib_rel_path} NO_DEFAULT_PATH)
++                endif ()
+                 ext_message(STATUS "TBB include: ${TBB_INCLUDE_DIRS}")
+                 ext_message(STATUS "TBB Release lib: ${TBB_LIBRARIES_RELEASE}")
+                 if (NOT LINUX)
 -- 
 2.17.1
 
