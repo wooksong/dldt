@@ -1,0 +1,9 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: dldt
+Source: https://github.com/opencv/dldt
+
+Files: *
+Copyright: Intel Corporation 2018-2019
+License: Apache-2.0
+ /usr/share/common-licenses/Apache-2.0
+

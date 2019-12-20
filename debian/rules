@@ -1,0 +1,72 @@
+#!/usr/bin/make -f
+
+export DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+export DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
+export DEB_CXXFLAGS_MAINT_APPEND ?= -std=c++11
+export SRC_ROOT ?= $(shell pwd)
+export DH_VERBOSE = 1
+
+
+EXTERNAL_ADE_ARCHIVE	:= ade-cbe2db61a659c2cc304c3837406f95c39dfa938e
+EXTERNAL_NGRAPH_ARCHIVE :=  ngraph-0.22.0-rc.2
+PREFIX	:=	/usr
+LIBDIR	:=	lib/${DEB_HOST_MULTIARCH}
+INCDIR	:=	include
+SYSCONFDIR := /etc
+DATADIR	:=	$(PREFIX)/share
+
+%:
+	dh $@ --with quilt --parallel
+
+override_dh_auto_configure:
+	cp $(SRC_ROOT)/packaging/$(EXTERNAL_ADE_ARCHIVE).tar.gz $(SRC_ROOT)/inference-engine/thirdparty
+	cp $(SRC_ROOT)/packaging/$(EXTERNAL_NGRAPH_ARCHIVE).tar.gz $(SRC_ROOT)/inference-engine/thirdparty
+	cd $(SRC_ROOT)/inference-engine/thirdparty && \
+			tar zxf $(EXTERNAL_ADE_ARCHIVE).tar.gz && \
+			mv $(EXTERNAL_ADE_ARCHIVE)/* ade/
+	cd $(SRC_ROOT)/inference-engine/thirdparty && \
+			tar zxf $(EXTERNAL_NGRAPH_ARCHIVE).tar.gz && \
+			mv $(EXTERNAL_NGRAPH_ARCHIVE)/* ngraph/
+	cd $(SRC_ROOT)/inference-engine/thirdparty && \
+			rm -rf *.tar.gz $(EXTERNAL_ADE_ARCHIVE)
+	cd $(SRC_ROOT)/inference-engine/thirdparty && \
+			rm -rf *.tar.gz $(EXTERNAL_NGRAPH_ARCHIVE)
+	cd $(SRC_ROOT)/inference-engine && rm -rf build && mkdir -p build
+	cd $(SRC_ROOT)/inference-engine/build && cmake .. \
+			-DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX:PATH=$(PREFIX) \
+			-DCMAKE_INSTALL_LIBDIR:PATH=$(LIBDIR) -DINCLUDE_INSTALL_DIR:PATH=$(INCDIR) \
+			-DLIB_INSTALL_DIR:PATH=$(LIBDIR) -DSYSCONF_INSTALL_DIR:PATH=$(SYSCONFDIR) \
+			-DSHARE_INSTALL_PREFIX:PATH=$(DATADIR) \
+			-DBUILD_SHARED_LIBS:BOOL=ON \
+			-DUSE_TBB_SYSTEM_DEPS=ON -DBUILD_ADE_DOCUMENTATION=OFF -DBUILD_ADE_TUTORIAL=OFF \
+			-DBUILD_PKGCONFIG=OFF -DBUILD_SHARED_LIBS=OFF -DBUILD_TESTING=OFF -DBUILD_TESTS=OFF \
+			-DCLDNN__INCLUDE_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=Release -DCOVERAGE=OFF \
+			-DDEVELOPMENT_PLUGIN_MODE=OFF -DENABLE_VPU=OFF -DENABLE_ADE_TESTING=OFF \
+			-DENABLE_AFFINITY_GENERATOR=OFF -DENABLE_ALTERNATIVE_TEMP=OFF -DENABLE_CLDNN=OFF \
+			-DENABLE_CLDNN_BUILD=OFF -DENABLE_CLDNN_TESTS=OFF -DENABLE_CPPCHECK=OFF -DENABLE_CPPLINT=OFF \
+			-DENABLE_CPPLINT_REPORT=OFF -DENABLE_CPP_CCT=OFF -DENABLE_DEBUG_SYMBOLS=OFF \
+			-DENABLE_FUZZING=OFF -DENABLE_GAPI_TESTS=OFF -DENABLE_GNA=OFF -DENABLE_LTO=OFF \
+			-DENABLE_MKL_DNN=OFF -DENABLE_MYRIAD=OFF -DENABLE_MYRIAD_MVNC_TESTS=OFF -DENABLE_MYRIAD_NO_BOOT=OFF \
+			-DENABLE_OBJECT_DETECTION_TESTS=ON -DENABLE_OPENCV=OFF -DENABLE_PLUGIN_RPATH=OFF \
+			-DENABLE_PROFILING_ITT=OFF -DENABLE_PROFILING_RAW=OFF -DENABLE_PYTHON=OFF -DENABLE_ROCKHOPER=OFF \
+			-DENABLE_SAMPLES=OFF -DENABLE_SAMPLES_CORE=OFF -DENABLE_SEGMENTATION_TESTS=OFF -DENABLE_TESTS=ON \
+			-DTREAT_WARNING_AS_ERROR=OFF
+
+override_dh_auto_build:
+		dh_auto_build --builddirectory=$(SRC_ROOT)/inference-engine/build --
+
+override_dh_auto_install:
+		mkdir -p $(SRC_ROOT)/debian/tmp$(PREFIX)/$(LIBDIR)
+		mkdir -p $(SRC_ROOT)/debian/tmp$(PREFIX)/$(INCDIR)
+		find $(SRC_ROOT)/inference-engine/bin -name "*.so" -exec install -m 644 {} $(SRC_ROOT)/debian/tmp$(PREFIX)/$(LIBDIR) \;
+		find $(SRC_ROOT)/inference-engine/bin -name "plugins.xml" -exec install -m 644 {} $(SRC_ROOT)/debian/tmp$(PREFIX)/$(LIBDIR) \;
+		cp -r $(SRC_ROOT)/inference-engine/include/* $(SRC_ROOT)/debian/tmp$(PREFIX)/$(INCDIR)
+		find $(SRC_ROOT)/inference-engine/bin -name "*.a" -exec install -m 644 {} $(SRC_ROOT)/debian/tmp$(PREFIX)/$(LIBDIR) \;
+
+override_dh_auto_clean:
+		dh_auto_clean --builddirectory=$(SRC_ROOT)/inference-engine/build --
+		rm -rf $(SRC_ROOT)/inference-engine/bin
+		rm -rf $(SRC_ROOT)/inference-engine/build
+		rm -rf $(SRC_ROOT)/debian/tmp
+		rm -rf $(SRC_ROOT)/inference-engine/thirdparty/ade/*
+		rm -rf $(SRC_ROOT)/inference-engine/thirdparty/ngraph/*

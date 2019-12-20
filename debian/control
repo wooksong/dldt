@@ -1,0 +1,39 @@
+Source: openvino
+Maintainer: Wook Song <wook16.song@samsung.com>
+Section: libs
+Priority: optional
+Build-Depends: debhelper (>= 9.0.0), quilt,
+ cmake, pkg-config,
+ gcc-9 | gcc-8 | gcc-7 | gcc-6 | gcc-5,
+ g++-9 | g++-8 | g++-7 | g++-6 | g++-5,
+ libtbb-dev (>=2019~U9-0)
+Standards-Version: 4.1.4
+Vcs-Git: git://git.tizen.org/platform/upstream/dldt
+Vcs-Browser: https://git.tizen.org/cgit/platform/upstream/dldt
+
+Package: libinference-engine
+Section: libs
+Priority: optional
+Architecture: any
+Multi-Arch: same
+Depends: ${shlibs:Depends}, ${misc:Depends}, libtbb
+Description: OpenVINO™ Toolkit - Deep Learning Deployment Toolkit
+ OpenVINO™ toolkit, short for Open Visual Inference and Neural network
+ Optimization toolkit, provides developers with improved neural network
+ performance on a variety of Intel® processors and helps them further
+ unlock cost-effective, real-time vision applications.
+ .
+ The toolkit enables deep learning inference and easy heterogeneous
+ execution across multiple Intel® platforms (CPU, Intel® Processor Graphics)
+ —providing implementations across cloud architectures to edge devices.
+ This open source distribution provides flexibility and availability to
+ the developer community to innovate deep learning and AI solutions.
+
+Package: libinference-engine-dev
+Section: libs
+Priority: optional
+Architecture: any
+Multi-Arch: same
+Depends: ${shlibs:Depends}, ${misc:Depends}, libinference-engine
+Description: OpenVINO™ Toolkit Development package
+ This is development package for Intel® OpenVINO™ Toolkit.

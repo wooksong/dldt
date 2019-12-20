@@ -1,0 +1,5 @@
+openvino (2019R3) unstable; urgency=low
+
+  * Initial debian packaging files are added
+
+ -- Wook Song <wook16.song@samsung.com>  Wed, 18 Dec 2019 13:19:20 +0900
