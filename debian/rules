@@ -14,6 +14,8 @@ LIBDIR	:=	lib/${DEB_HOST_MULTIARCH}
 INCDIR	:=	include
 SYSCONFDIR := /etc
 DATADIR	:=	$(PREFIX)/share
+DEBVERS := $(shell dpkg-parsechangelog | sed -n -e 's/^Version: //p')
+VERSION := $(shell echo '$(DEBVERS)' | sed -e 's/^[[:digit:]]*://' -e 's/[~-].*//')
 
 %:
 	dh $@ --with quilt --parallel
@@ -58,10 +60,17 @@ override_dh_auto_build:
 override_dh_auto_install:
 		mkdir -p $(SRC_ROOT)/debian/tmp$(PREFIX)/$(LIBDIR)
 		mkdir -p $(SRC_ROOT)/debian/tmp$(PREFIX)/$(INCDIR)
+		mkdir -p debian/tmp$(PREFIX)/$(LIBDIR)/pkgconfig
 		find $(SRC_ROOT)/inference-engine/bin -name "*.so" -exec install -m 644 {} $(SRC_ROOT)/debian/tmp$(PREFIX)/$(LIBDIR) \;
 		find $(SRC_ROOT)/inference-engine/bin -name "plugins.xml" -exec install -m 644 {} $(SRC_ROOT)/debian/tmp$(PREFIX)/$(LIBDIR) \;
 		cp -r $(SRC_ROOT)/inference-engine/include/* $(SRC_ROOT)/debian/tmp$(PREFIX)/$(INCDIR)
 		find $(SRC_ROOT)/inference-engine/bin -name "*.a" -exec install -m 644 {} $(SRC_ROOT)/debian/tmp$(PREFIX)/$(LIBDIR) \;
+		cp -f $(SRC_ROOT)/packaging/libinference-engine.pc.in debian/tmp$(PREFIX)/$(LIBDIR)/pkgconfig
+		sed -i 's|@VERSION@|$(VERSION)|g' debian/tmp$(PREFIX)/$(LIBDIR)/pkgconfig/libinference-engine.pc.in
+		sed -i 's|@PREFIX@|$(PREFIX)|g' debian/tmp$(PREFIX)/$(LIBDIR)/pkgconfig/libinference-engine.pc.in
+		sed -i 's|@LIB_INSTALL_DIR@|$(PREFIX)/$(LIBDIR)|g' debian/tmp$(PREFIX)/$(LIBDIR)/pkgconfig/libinference-engine.pc.in
+		sed -i 's|@INCLUDE_INSTALL_DIR@|$(PREFIX)/$(INCDIR)|g' debian/tmp$(PREFIX)/$(LIBDIR)/pkgconfig/libinference-engine.pc.in
+		mv debian/tmp$(PREFIX)/$(LIBDIR)/pkgconfig/libinference-engine.pc.in debian/tmp$(PREFIX)/$(LIBDIR)/pkgconfig/libinference-engine.pc
 
 override_dh_auto_clean:
 		dh_auto_clean --builddirectory=$(SRC_ROOT)/inference-engine/build --

@@ -4,3 +4,4 @@
 /usr/lib/*/libinference_engine_s.a
 /usr/lib/*/libngraph.a
 /usr/lib/*/libpugixml.a
+/usr/lib/*/pkgconfig/*.pc

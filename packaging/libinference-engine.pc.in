@@ -1,0 +1,10 @@
+prefix=@PREFIX@
+libdir=@LIB_INSTALL_DIR@
+includedir=@INCLUDE_INSTALL_DIR@
+
+Name: libinference-engine
+Description: OpenVINO™ Toolkit Development package
+Version: @VERSION@
+Requires:
+Libs: -L${libdir} -linference_engine
+Cflags: -I${includedir}
