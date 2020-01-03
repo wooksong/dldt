@@ -1,2 +1,6 @@
-/usr/lib/*/*.so
 /usr/lib/*/*.xml
+/usr/lib/*/libHeteroPlugin.so
+/usr/lib/*/libmock_engine.so
+/usr/lib/*/libinference_engine.so
+/usr/lib/*/libmyriadPlugin.so
+/usr/lib/*/libformat_reader.so

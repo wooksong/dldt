@@ -18,6 +18,7 @@ Priority: optional
 Architecture: any
 Multi-Arch: same
 Depends: ${shlibs:Depends}, ${misc:Depends}, libtbb
+Recommends: libinference-engine-cpu-mkldnn [amd64]
 Description: OpenVINO™ Toolkit - Deep Learning Deployment Toolkit
  OpenVINO™ toolkit, short for Open Visual Inference and Neural network
  Optimization toolkit, provides developers with improved neural network
@@ -38,3 +39,15 @@ Multi-Arch: same
 Depends: ${shlibs:Depends}, ${misc:Depends}, libinference-engine
 Description: OpenVINO™ Toolkit Development package
  This is development package for Intel® OpenVINO™ Toolkit.
+
+Package: libinference-engine-cpu-mkldnn
+Section: libs
+Priority: optional
+Architecture: amd64
+Multi-Arch: same
+Depends: ${shlibs:Depends}, ${misc:Depends}, libinference-engine
+Description: CPU plugin for OpenVINO™ Toolkit
+ This package contains the CPU plugin, which was developed in order to provide
+ opportunity for high performance scoring of neural networks on CPU, using the
+ Intel® Math Kernel Library for Deep Neural Networks (Intel® MKL-DNN),
+ of the OpenVINO™ toolkit
