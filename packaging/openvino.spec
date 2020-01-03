@@ -136,14 +136,17 @@ sed -i 's|@INCLUDE_INSTALL_DIR@|%{_includedir}|g' libinference-engine.pc.in
 
 %install
 mkdir -p %{buildroot}%{_libdir}
-mkdir -p %{buildroot}%{_libdir}/tbb
 mkdir -p %{buildroot}%{_libdir}/pkgconfig
 cp libinference-engine.pc.in %{buildroot}%{_libdir}/pkgconfig/libinference-engine.pc
 
 pushd inference-engine/bin/%{install_arch}/Release
 install -m 644 lib/*.so %{buildroot}%{_libdir}
 install -m 644 lib/*.xml %{buildroot}%{_libdir}
-install -m 644 lib/*.a %{buildroot}%{_libdir}/tbb
+install -m 644 lib/libngraph.a %{buildroot}%{_libdir}
+install -m 644 lib/libinference_engine_s.a %{buildroot}%{_libdir}
+install -m 644 lib/libhelpers.a %{buildroot}%{_libdir}
+install -m 644 lib/libpugixml.a %{buildroot}%{_libdir}
+install -m 644 lib/libfluid.a %{buildroot}%{_libdir}
 popd
 
 mkdir -p %{buildroot}%{_includedir}
@@ -182,6 +185,6 @@ popd
 %files devel
 %manifest %{name}.manifest
 %license LICENSE
-%{_libdir}/tbb/*.a
+%{_libdir}/*.a
 %{_libdir}/pkgconfig/libinference-engine.pc
 %{_includedir}/*
