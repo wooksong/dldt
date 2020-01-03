@@ -55,6 +55,7 @@ Source0:        %{name}-%{version}.tar.gz
 Source1:        %{name}.manifest
 Source1001:     %{external_ade_archive}.tar.gz
 Source1002:     %{external_ngraph_archive}.tar.gz
+Source1003:     libinference-engine.pc.in
 Patch0:         0001-CMake-Do-not-call-get_linux_name-when-LINUX_OS_NAME-.patch
 Patch1:         0002-CMake-Add-a-variable-to-resolve-dependency-on-TBB-us.patch
 BuildRequires:  cmake
@@ -85,6 +86,7 @@ This contains corresponding header files and static archives.
 cp %{SOURCE1} .
 cp %{SOURCE1001} ./inference-engine/thirdparty
 cp %{SOURCE1002} ./inference-engine/thirdparty
+cp %{SOURCE1003} .
 pushd inference-engine
 pushd thirdparty
 tar zxf %{external_ade_archive}.tar.gz
@@ -127,15 +129,23 @@ pushd build
 %{__make} %{?_smp_mflags}
 popd
 popd
+sed -i 's|@VERSION@|%{version}|g' libinference-engine.pc.in
+sed -i 's|@PREFIX@|%{_prefix}|g' libinference-engine.pc.in
+sed -i 's|@LIB_INSTALL_DIR@|%{_libdir}|g' libinference-engine.pc.in
+sed -i 's|@INCLUDE_INSTALL_DIR@|%{_includedir}|g' libinference-engine.pc.in
 
 %install
 mkdir -p %{buildroot}%{_libdir}
 mkdir -p %{buildroot}%{_libdir}/tbb
+mkdir -p %{buildroot}%{_libdir}/pkgconfig
+cp libinference-engine.pc.in %{buildroot}%{_libdir}/pkgconfig/libinference-engine.pc
+
 pushd inference-engine/bin/%{install_arch}/Release
 install -m 644 lib/*.so %{buildroot}%{_libdir}
 install -m 644 lib/*.xml %{buildroot}%{_libdir}
 install -m 644 lib/*.a %{buildroot}%{_libdir}/tbb
 popd
+
 mkdir -p %{buildroot}%{_includedir}
 mkdir -p %{buildroot}%{_includedir}/builders
 mkdir -p %{buildroot}%{_includedir}/cpp
@@ -173,4 +183,5 @@ popd
 %manifest %{name}.manifest
 %license LICENSE
 %{_libdir}/tbb/*.a
+%{_libdir}/pkgconfig/libinference-engine.pc
 %{_includedir}/*
