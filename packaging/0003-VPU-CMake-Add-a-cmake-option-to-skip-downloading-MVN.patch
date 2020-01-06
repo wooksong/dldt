@@ -1,0 +1,68 @@
+From 5ffd669730e185d4e7f2d4c56a701d035f2186b6 Mon Sep 17 00:00:00 2001
+From: Wook Song <wook16.song@samsung.com>
+Date: Mon, 6 Jan 2020 18:44:39 +0900
+Subject: [PATCH 1/1] [VPU/CMake] Add a cmake option to skip downloading MVNC
+ firmwares
+
+In order to build via GBS/OBS (Tizen) or pdebuild/debuild (Ubuntu),
+which does not support resolving dependencies via network, this patch
+adds a cmake option to skip downloading MVNC firmwares while building
+the inference-engine and its VPU plugin.
+
+Change-Id: I913cd3fc59c5ebada0f7d11ebc55a7df9f2537a8
+Signed-off-by: Wook Song <wook16.song@samsung.com>
+---
+ inference-engine/cmake/dependencies.cmake                 | 6 +++++-
+ inference-engine/src/vpu/myriad_plugin/CMakeLists.txt     | 4 +++-
+ inference-engine/thirdparty/movidius/XLink/CMakeLists.txt | 4 +++-
+ 3 files changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/inference-engine/cmake/dependencies.cmake b/inference-engine/cmake/dependencies.cmake
+index 682f2e55..aa5d76c9 100644
+--- a/inference-engine/cmake/dependencies.cmake
++++ b/inference-engine/cmake/dependencies.cmake
+@@ -17,7 +17,11 @@ if(COMMAND get_linux_name)
+ endif()
+ 
+ if (ENABLE_MYRIAD)
+-    include(vpu_dependencies)
++    if (USE_MYRIAD_SYSTEM_DEPS)
++        message(STATUS "Use MVNC firmware provided by other packages or pre-installed in the system")
++    else ()
++        include(vpu_dependencies)
++    endif ()
+ endif()
+ 
+ ## enable cblas_gemm from OpenBLAS package
+diff --git a/inference-engine/src/vpu/myriad_plugin/CMakeLists.txt b/inference-engine/src/vpu/myriad_plugin/CMakeLists.txt
+index 7023513d..7a2c9da7 100644
+--- a/inference-engine/src/vpu/myriad_plugin/CMakeLists.txt
++++ b/inference-engine/src/vpu/myriad_plugin/CMakeLists.txt
+@@ -11,7 +11,9 @@ ie_add_plugin(NAME ${TARGET_NAME}
+               SOURCES ${SOURCES}
+               VERSION_DEFINES_FOR api/myriad_api.cpp)
+ 
+-add_dependencies(${TARGET_NAME} vpu_copy_firmware)
++if (NOT USE_MYRIAD_SYSTEM_DEPS)
++    add_dependencies(${TARGET_NAME} vpu_copy_firmware)
++endif ()
+ if(TARGET vpu_compile_custom_kernels)
+     add_dependencies(${TARGET_NAME} vpu_compile_custom_kernels)
+ endif()
+diff --git a/inference-engine/thirdparty/movidius/XLink/CMakeLists.txt b/inference-engine/thirdparty/movidius/XLink/CMakeLists.txt
+index 658081f4..96424502 100644
+--- a/inference-engine/thirdparty/movidius/XLink/CMakeLists.txt
++++ b/inference-engine/thirdparty/movidius/XLink/CMakeLists.txt
+@@ -57,6 +57,8 @@ if (ENABLE_MYRIAD_NO_BOOT)
+             NO_BOOT)
+ endif()
+ 
+-add_dependencies(${TARGET_NAME} vpu_copy_firmware)
++if (NOT USE_MYRIAD_SYSTEM_DEPS)
++     add_dependencies(${TARGET_NAME} vpu_copy_firmware)
++endif ()
+ 
+ set_property(TARGET ${TARGET_NAME} PROPERTY C_STANDARD 99)
+-- 
+2.17.1
+

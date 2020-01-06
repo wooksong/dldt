@@ -58,8 +58,10 @@ Source1002:     %{external_ngraph_archive}.tar.gz
 Source1003:     openvino.pc.in
 Patch0:         0001-CMake-Do-not-call-get_linux_name-when-LINUX_OS_NAME-.patch
 Patch1:         0002-CMake-Add-a-variable-to-resolve-dependency-on-TBB-us.patch
+Patch2:         0003-VPU-CMake-Add-a-cmake-option-to-skip-downloading-MVN.patch
 BuildRequires:  cmake
 BuildRequires:  pkgconfig(libtbb)
+BuildRequires:  pkgconfig(libusb-1.0)
 BuildRequires:  pkg-config
 
 %description
@@ -83,6 +85,7 @@ This contains corresponding header files and static archives.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 cp %{SOURCE1} .
 cp %{SOURCE1001} ./inference-engine/thirdparty
 cp %{SOURCE1002} ./inference-engine/thirdparty
@@ -105,17 +108,17 @@ cmake .. \
         -DCMAKE_INSTALL_LIBDIR:PATH=%{_libdir} -DINCLUDE_INSTALL_DIR:PATH=%{_includedir} \
         -DLIB_INSTALL_DIR:PATH=%{_libdir} -DSYSCONF_INSTALL_DIR:PATH=%{_sysconfdir} \
         -DSHARE_INSTALL_PREFIX:PATH=%{_datadir} \
-        %{?_cmake_skip_rpath} \
-        -DBUILD_SHARED_LIBS:BOOL=ON \
-        -DUSE_TBB_SYSTEM_DEPS=ON -DBUILD_ADE_DOCUMENTATION=OFF -DBUILD_ADE_TUTORIAL=OFF \
+        %{?_cmake_skip_rpath} -DUSE_TBB_SYSTEM_DEPS=ON -DUSE_MYRIAD_SYSTEM_DEPS=ON \
+        -DENABLE_VPU=ON -DENABLE_MYRIAD=ON -DENABLE_MYRIAD_MVNC_TESTS=OFF -DENABLE_MYRIAD_NO_BOOT=OFF \
+        -DBUILD_ADE_DOCUMENTATION=OFF -DBUILD_ADE_TUTORIAL=OFF \
         -DBUILD_PKGCONFIG=OFF -DBUILD_SHARED_LIBS=OFF -DBUILD_TESTING=OFF -DBUILD_TESTS=OFF \
         -DCLDNN__INCLUDE_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=Release -DCOVERAGE=OFF \
-        -DDEVELOPMENT_PLUGIN_MODE=OFF -DENABLE_VPU=OFF -DENABLE_ADE_TESTING=OFF \
+        -DDEVELOPMENT_PLUGIN_MODE=OFF-DENABLE_ADE_TESTING=OFF \
         -DENABLE_AFFINITY_GENERATOR=OFF -DENABLE_ALTERNATIVE_TEMP=OFF -DENABLE_CLDNN=OFF \
         -DENABLE_CLDNN_BUILD=OFF -DENABLE_CLDNN_TESTS=OFF -DENABLE_CPPCHECK=OFF -DENABLE_CPPLINT=OFF \
         -DENABLE_CPPLINT_REPORT=OFF -DENABLE_CPP_CCT=OFF -DENABLE_DEBUG_SYMBOLS=OFF \
         -DENABLE_FUZZING=OFF -DENABLE_GAPI_TESTS=OFF -DENABLE_GNA=OFF -DENABLE_LTO=OFF \
-        -DENABLE_MKL_DNN=OFF -DENABLE_MYRIAD=OFF -DENABLE_MYRIAD_MVNC_TESTS=OFF -DENABLE_MYRIAD_NO_BOOT=OFF \
+        -DENABLE_MKL_DNN=OFF \
         -DENABLE_OBJECT_DETECTION_TESTS=ON -DENABLE_OPENCV=OFF -DENABLE_PLUGIN_RPATH=OFF \
         -DENABLE_PROFILING_ITT=OFF -DENABLE_PROFILING_RAW=OFF -DENABLE_PYTHON=OFF -DENABLE_ROCKHOPER=OFF \
         -DENABLE_SAMPLES=OFF -DENABLE_SAMPLES_CORE=OFF -DENABLE_SEGMENTATION_TESTS=OFF -DENABLE_TESTS=ON \
@@ -142,11 +145,13 @@ cp openvino.pc.in %{buildroot}%{_libdir}/pkgconfig/openvino.pc
 pushd inference-engine/bin/%{install_arch}/Release
 install -m 644 lib/*.so %{buildroot}%{_libdir}
 install -m 644 lib/*.xml %{buildroot}%{_libdir}
-install -m 644 lib/libngraph.a %{buildroot}%{_libdir}
-install -m 644 lib/libinference_engine_s.a %{buildroot}%{_libdir}
-install -m 644 lib/libhelpers.a %{buildroot}%{_libdir}
-install -m 644 lib/libpugixml.a %{buildroot}%{_libdir}
-install -m 644 lib/libfluid.a %{buildroot}%{_libdir}
+rm -rf lib/libstb_image.a
+rm -rf lib/libgflags_nothreads.a
+rm -rf lib/libgtest_main.a
+rm -rf lib/libgtest.a
+rm -rf lib/libgmock_main.a
+rm -rf lib/libgmock.a
+install -m 644 lib/*.a %{buildroot}%{_libdir}
 popd
 
 mkdir -p %{buildroot}%{_includedir}
