@@ -55,7 +55,7 @@ Source0:        %{name}-%{version}.tar.gz
 Source1:        %{name}.manifest
 Source1001:     %{external_ade_archive}.tar.gz
 Source1002:     %{external_ngraph_archive}.tar.gz
-Source1003:     libinference-engine.pc.in
+Source1003:     openvino.pc.in
 Patch0:         0001-CMake-Do-not-call-get_linux_name-when-LINUX_OS_NAME-.patch
 Patch1:         0002-CMake-Add-a-variable-to-resolve-dependency-on-TBB-us.patch
 BuildRequires:  cmake
@@ -129,15 +129,15 @@ pushd build
 %{__make} %{?_smp_mflags}
 popd
 popd
-sed -i 's|@VERSION@|%{version}|g' libinference-engine.pc.in
-sed -i 's|@PREFIX@|%{_prefix}|g' libinference-engine.pc.in
-sed -i 's|@LIB_INSTALL_DIR@|%{_libdir}|g' libinference-engine.pc.in
-sed -i 's|@INCLUDE_INSTALL_DIR@|%{_includedir}|g' libinference-engine.pc.in
+sed -i 's|@VERSION@|%{version}|g' openvino.pc.in
+sed -i 's|@PREFIX@|%{_prefix}|g' openvino.pc.in
+sed -i 's|@LIB_INSTALL_DIR@|%{_libdir}|g' openvino.pc.in
+sed -i 's|@INCLUDE_INSTALL_DIR@|%{_includedir}|g' openvino.pc.in
 
 %install
 mkdir -p %{buildroot}%{_libdir}
 mkdir -p %{buildroot}%{_libdir}/pkgconfig
-cp libinference-engine.pc.in %{buildroot}%{_libdir}/pkgconfig/libinference-engine.pc
+cp openvino.pc.in %{buildroot}%{_libdir}/pkgconfig/openvino.pc
 
 pushd inference-engine/bin/%{install_arch}/Release
 install -m 644 lib/*.so %{buildroot}%{_libdir}
@@ -186,5 +186,5 @@ popd
 %manifest %{name}.manifest
 %license LICENSE
 %{_libdir}/*.a
-%{_libdir}/pkgconfig/libinference-engine.pc
+%{_libdir}/pkgconfig/openvino.pc
 %{_includedir}/*

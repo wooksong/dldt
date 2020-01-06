@@ -72,12 +72,12 @@ override_dh_auto_install:
 		find $(SRC_ROOT)/inference-engine/bin -name "plugins.xml" -exec install -m 644 {} $(SRC_ROOT)/debian/tmp$(PREFIX)/$(LIBDIR) \;
 		cp -r $(SRC_ROOT)/inference-engine/include/* $(SRC_ROOT)/debian/tmp$(PREFIX)/$(INCDIR)
 		find $(SRC_ROOT)/inference-engine/bin -name "*.a" -exec install -m 644 {} $(SRC_ROOT)/debian/tmp$(PREFIX)/$(LIBDIR) \;
-		cp -f $(SRC_ROOT)/packaging/libinference-engine.pc.in debian/tmp$(PREFIX)/$(LIBDIR)/pkgconfig
-		sed -i 's|@VERSION@|$(VERSION)|g' debian/tmp$(PREFIX)/$(LIBDIR)/pkgconfig/libinference-engine.pc.in
-		sed -i 's|@PREFIX@|$(PREFIX)|g' debian/tmp$(PREFIX)/$(LIBDIR)/pkgconfig/libinference-engine.pc.in
-		sed -i 's|@LIB_INSTALL_DIR@|$(PREFIX)/$(LIBDIR)|g' debian/tmp$(PREFIX)/$(LIBDIR)/pkgconfig/libinference-engine.pc.in
-		sed -i 's|@INCLUDE_INSTALL_DIR@|$(PREFIX)/$(INCDIR)|g' debian/tmp$(PREFIX)/$(LIBDIR)/pkgconfig/libinference-engine.pc.in
-		mv debian/tmp$(PREFIX)/$(LIBDIR)/pkgconfig/libinference-engine.pc.in debian/tmp$(PREFIX)/$(LIBDIR)/pkgconfig/libinference-engine.pc
+		cp -f $(SRC_ROOT)/packaging/openvino.pc.in debian/tmp$(PREFIX)/$(LIBDIR)/pkgconfig
+		sed -i 's|@VERSION@|$(VERSION)|g' debian/tmp$(PREFIX)/$(LIBDIR)/pkgconfig/openvino.pc.in
+		sed -i 's|@PREFIX@|$(PREFIX)|g' debian/tmp$(PREFIX)/$(LIBDIR)/pkgconfig/openvino.pc.in
+		sed -i 's|@LIB_INSTALL_DIR@|$(PREFIX)/$(LIBDIR)|g' debian/tmp$(PREFIX)/$(LIBDIR)/pkgconfig/openvino.pc.in
+		sed -i 's|@INCLUDE_INSTALL_DIR@|$(PREFIX)/$(INCDIR)|g' debian/tmp$(PREFIX)/$(LIBDIR)/pkgconfig/openvino.pc.in
+		mv debian/tmp$(PREFIX)/$(LIBDIR)/pkgconfig/openvino.pc.in debian/tmp$(PREFIX)/$(LIBDIR)/pkgconfig/openvino.pc
 ifneq ($(filter $(DEB_HOST_ARCH),amd64),)
 		cp -r $(SRC_ROOT)/inference-engine/src/extension/ext_list.hpp $(SRC_ROOT)/debian/tmp$(PREFIX)/$(INCDIR)
 endif
