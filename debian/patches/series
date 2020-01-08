@@ -1,2 +1,3 @@
 0001-CMake-Do-not-call-get_linux_name-when-LINUX_OS_NAME-.patch
 0002-CMake-Add-a-variable-to-resolve-dependency-on-TBB-us.patch
+0003-VPU-CMake-Add-a-cmake-option-to-skip-downloading-MVN.patch
