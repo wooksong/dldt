@@ -12,13 +12,13 @@ Standards-Version: 4.1.4
 Vcs-Git: git://git.tizen.org/platform/upstream/dldt
 Vcs-Browser: https://git.tizen.org/cgit/platform/upstream/dldt
 
-Package: libinference-engine
+Package: openvino
 Section: libs
 Priority: optional
 Architecture: any
 Multi-Arch: same
 Depends: ${shlibs:Depends}, ${misc:Depends}, libtbb
-Recommends: libinference-engine-cpu-mkldnn [amd64]
+Recommends: openvino-cpu-mkldnn [amd64]
 Description: OpenVINO™ Toolkit - Deep Learning Deployment Toolkit
  OpenVINO™ toolkit, short for Open Visual Inference and Neural network
  Optimization toolkit, provides developers with improved neural network
@@ -31,21 +31,21 @@ Description: OpenVINO™ Toolkit - Deep Learning Deployment Toolkit
  This open source distribution provides flexibility and availability to
  the developer community to innovate deep learning and AI solutions.
 
-Package: libinference-engine-dev
+Package: openvino-dev
 Section: libs
 Priority: optional
 Architecture: any
 Multi-Arch: same
-Depends: ${shlibs:Depends}, ${misc:Depends}, libinference-engine
+Depends: ${shlibs:Depends}, ${misc:Depends}, openvino
 Description: OpenVINO™ Toolkit Development package
  This is development package for Intel® OpenVINO™ Toolkit.
 
-Package: libinference-engine-cpu-mkldnn
+Package: openvino-cpu-mkldnn
 Section: libs
 Priority: optional
 Architecture: amd64
 Multi-Arch: same
-Depends: ${shlibs:Depends}, ${misc:Depends}, libinference-engine
+Depends: ${shlibs:Depends}, ${misc:Depends}, openvino
 Description: CPU plugin for OpenVINO™ Toolkit
  This package contains the CPU plugin, which was developed in order to provide
  opportunity for high performance scoring of neural networks on CPU, using the

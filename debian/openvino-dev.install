@@ -1,6 +1,5 @@
 /usr/include/*
 /usr/lib/*/libfluid.a
-/usr/lib/*/libhelpers.a
 /usr/lib/*/libinference_engine_s.a
 /usr/lib/*/libngraph.a
 /usr/lib/*/libpugixml.a

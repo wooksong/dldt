@@ -1,3 +1,10 @@
+openvino (2019R3-1) unstable; urgency=low
+
+  * CPU and VPU plugins are enabled
+  * Package name is changed
+
+ -- Wook Song <wook16.song@samsung.com>  Wed, 8 Jan 2020 11:24:25 +0900
+
 openvino (2019R3) unstable; urgency=low
 
   * Initial debian packaging files are added
